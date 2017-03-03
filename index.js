@@ -37,9 +37,6 @@ module.exports = function (host, opts) {
       }).catch(ModuleNotFoundError, function (/* err */) {
 
         if (opts.noRecord) {
-          console.error(req.headers);
-          console.error(req.cookies);
-          console.error(Buffer.concat(body).toString());
           throw new RecordingDisabledError('Recording Disabled');
         } else {
           return proxy(req, body, host).then(function (pres) {
@@ -64,6 +61,8 @@ module.exports = function (host, opts) {
   };
 
 };
+
+module.exports.filter = filters.addFilter;
 
 /**
  * Returns the tape name for `req`.
