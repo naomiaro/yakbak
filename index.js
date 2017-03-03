@@ -2,7 +2,6 @@
 // Licensed under the terms of the MIT license. Please see LICENSE file in the project root for terms.
 
 var Promise = require('bluebird');
-var hash = require('incoming-message-hash');
 var assert = require('assert');
 var mkdirp = require('mkdirp');
 var path = require('path');
@@ -10,6 +9,7 @@ var buffer = require('./lib/buffer');
 var proxy = require('./lib/proxy');
 var record = require('./lib/record');
 var curl = require('./lib/curl');
+var filters = require('./lib/filters');
 var debug = require('debug')('yakbak:server');
 
 /**
@@ -37,10 +37,13 @@ module.exports = function (host, opts) {
       }).catch(ModuleNotFoundError, function (/* err */) {
 
         if (opts.noRecord) {
+          console.error(req.headers);
+          console.error(req.cookies);
+          console.error(Buffer.concat(body).toString());
           throw new RecordingDisabledError('Recording Disabled');
         } else {
           return proxy(req, body, host).then(function (pres) {
-            return record(pres.req, pres, file);
+            return record(pres.req, pres, file, body);
           });
         }
 
@@ -70,7 +73,7 @@ module.exports = function (host, opts) {
  */
 
 function tapename(req, body) {
-  return hash.sync(req, Buffer.concat(body)) + '.js';
+  return filters.createFilename(req, Buffer.concat(body).toString());
 }
 
 /**
