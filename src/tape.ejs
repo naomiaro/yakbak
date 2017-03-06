@@ -21,9 +21,9 @@ module.exports = function (req, res) {
 
   res.setHeader("x-yakbak-tape", path.basename(__filename, ".js"));
 
-<% body.forEach(function (data) { -%>
-  res.write(new Buffer(<%- JSON.stringify(data.toString()) %>));
-<% }); -%>
+
+  res.write(new Buffer(<%- JSON.stringify(body.toString()) %>));
+
   res.end();
 
   return __filename;
